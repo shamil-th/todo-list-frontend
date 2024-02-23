@@ -28,6 +28,20 @@ export const showTasks = createAsyncThunk('todoList/showTasks', async() => {
     }
 })
 
+// edit task
+export const updateTask = createAsyncThunk('todoList/updateTask', async({id,data}) => {
+
+    try{
+        const response = await axios.put(`http://localhost:4000/${id}`,data);
+        if(!response.data){
+            throw new Error('creating new task failed')
+        }
+        return response.data
+    }catch(error){
+        console.error("something went wrong",error)
+    }
+})
+
 // delete task
 export const removeTask = createAsyncThunk('todoList/removeTask', async(id) => {
     try{
@@ -45,12 +59,15 @@ const initialState = {
     todoList:[],
     taskCount:"",
     status:[],
+    completedCount:0
   };
   
   const todoSlice = createSlice({
     name: "todoList",
     initialState,
-    reducers: {},
+    reducers: {
+        
+    },
     extraReducers: (builder) => {
       builder
         .addCase(createTask.fulfilled, (state) => {
@@ -71,6 +88,12 @@ const initialState = {
           state.status = "success";
         })
         .addCase(removeTask.rejected, (state) => {
+          state.status = "failed";
+        })
+        .addCase(updateTask.fulfilled, (state) => {
+          state.status = "success";
+        })
+        .addCase(updateTask.rejected, (state) => {
           state.status = "failed";
         })
     },
